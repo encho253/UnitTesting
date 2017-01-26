@@ -6,11 +6,32 @@
 
     public class Course : ICourse
     {
+        private const int MaxStudentsCountInCourse = 30;
         private IList<IStudent> students;
+        private string name;
 
-        public Course(IList<IStudent> students)
+        public Course(string name)
         {
-            this.Students = students;
+            this.Name = name;
+            students = new List<IStudent>();
+        }
+
+        public string Name
+        {
+            get
+            {
+                return this.name;
+            }
+
+            private set
+            {
+                if (String.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentNullException();
+                }
+
+                this.name = value;
+            }     
         }
 
         public IList<IStudent> Students
@@ -18,16 +39,22 @@
             get
             {
                 return this.students;
-            }
-            set
-            {
-                if (value.Count > 30)
-                {
-                    throw new IndexOutOfRangeException();
-                }
+            }          
+        }
 
-                this.students = value;
+        public void JoinToCourse(IStudent student)
+        {
+            if (students.Count > MaxStudentsCountInCourse)
+            {
+                throw new IndexOutOfRangeException();
             }
+
+            students.Add(student);
+        }
+
+        public void LeaveFromCourse(IStudent student)
+        {    
+            students.Remove(student);
         }
     }
 }

@@ -5,6 +5,9 @@
 
     public class Student : IStudent
     {
+        private const int MinIDLenght = 10000;
+        private const int MaxIDLenght = 99999;
+
         private string name;
         private int id;
 
@@ -39,23 +42,13 @@
             }
             set
             {
-                if (value < 10000 && value > 99999)
+                if (value < MinIDLenght || value > MaxIDLenght)
                 {
                     throw new IndexOutOfRangeException();
                 }
 
                 this.id = value;
             }
-        }
-
-        public void JoinToCourse(ICourse course)
-        {
-            course.Students.Add(this);
-        }
-
-        public void LeaveFromCourse(ICourse course)
-        {
-            course.Students.Remove(this);
-        }
+        }      
     }
 }
