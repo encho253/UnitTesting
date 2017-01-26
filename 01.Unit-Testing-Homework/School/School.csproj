@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\ICourse.cs" />
+    <Compile Include="Contracts\IStudent.cs" />
     <Compile Include="Course.cs" />
     <Compile Include="School.cs" />
     <Compile Include="Student.cs" />
