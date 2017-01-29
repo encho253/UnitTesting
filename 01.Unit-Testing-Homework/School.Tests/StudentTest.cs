@@ -7,16 +7,7 @@ namespace School.Tests
 
     [TestFixture]
     public class StudentTest
-    {
-        [Test]
-        [TestCase("Gosho", 55256)]
-        [TestCase("Misho", 99999)]
-        [TestCase("Ivanka", 10000)]
-        public void CreateStudent_ShouldCreateObjectFromClassStudentSuccessfully(string name, int id)
-        {
-            Student student = new Student(name, id);
-        }
-
+    {     
         [Test]
         public void TestStudent_ToHaveExpectedName()
         {

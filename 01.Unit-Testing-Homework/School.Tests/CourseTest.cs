@@ -3,21 +3,18 @@
     using NUnit.Framework;
     using Contracts;
     using System;
-    using System.Text;
+    using System.Collections.Generic;
 
     [TestFixture]
     public class CourseTest
     {
         [Test]
-        public void CreateCourse_ShouldCreateObjectFromClassCourseSuccessfully()
-        {
-            ICourse course = new Course("Math");
-        }
-
-        [Test]
         public void TestCourse_ToHaveExpectedName()
         {
-            ICourse course = new Course("Math");
+            IStudent student = new Student("Pesho",88991);
+            IList<IStudent> students = new List<IStudent>();
+            ICourse course = new Course("Math",students);
+
             string courseName = "Math";
 
             Assert.AreEqual(courseName, course.Name);
@@ -26,73 +23,71 @@
         [Test]
         public void TestCourse_TryToSetCourseNameWithEmptyString_ExpectedArgumentNullException()
         {
-            ICourse course = new Course("Math");
+            IStudent student = new Student("Pesho", 88991);
+            IList<IStudent> students = new List<IStudent>();
+            ICourse course = new Course("Math",students);
 
-            Assert.Throws<ArgumentNullException>(() => new Course(""));
+            Assert.Throws<ArgumentNullException>(() => course.Name = "" );
+        }       
+        [Test]
+        public void JoinToCourse_ShouldAddStudentToCourseSuccessfully_WitoutThrowException()
+        {
+            IStudent student = new Student("Pesho", 88991);
+            IList<IStudent> students = new List<IStudent>();
+            
+            ICourse course = new Course("Math", students);
+
+            Assert.DoesNotThrow(() => course.JoinToCourse(student));
         }
 
         [Test]
-        public void GetStudents_ShouldReadStudentsFromCourseSuccessfully()
+        public void LeaveFromCourse_ShouldStudentLeaveFromCourseSuccessfully_WitoutThrowException()
         {
-            IStudent student = new Student("Pesho", 22445);
-            ICourse course = new Course("Phisic");
-            StringBuilder builder = new StringBuilder();
+            IStudent student = new Student("Pesho", 88991);
+            IList<IStudent> students = new List<IStudent>();
+            students.Add(student);
+            ICourse course = new Course("Math", students);
 
-            course.JoinToCourse(student);
-
-            foreach (var item in course.Students)
-            {
-                builder.AppendLine(item.ToString());
-            }
+            Assert.DoesNotThrow(() => course.LeaveFromCourse(student));
         }
 
         [Test]
-        public void JoinToCourse_ShouldAddStudentToCourseSuccessfully_IfStudentIsNotNull_AndStudentsAreLessThan30InThisCourse()
+        public void LeaveFromCourse_ShouldNotStudentLeaveFromCourseWhichIsNotRecorded_ExpectedToThrowArgumentException()
         {
-            Student studentPenko = new Student("Penko", 22225);
+            IStudent pesho = new Student("Pesho", 88991);
+            IStudent gosho = new Student("Gosho", 55679);
+            IList<IStudent> students = new List<IStudent>();
+            students.Add(pesho);
+            ICourse course = new Course("Math", students);
 
-            ICourse course = new Course("Yoga");
-
-            course.JoinToCourse(studentPenko);
+            Assert.Throws<ArgumentException>(() => course.LeaveFromCourse(gosho));
         }
 
         [Test]
-        public void LeaveFromCourse_ShouldLeaveStudentFromCourseSuccessfully_IfStudentIsNotNull()
+        public void LeaveFromCourse_ShouldNotStudentLeaveFromEmptyCourse_ExpectedIndexOutOfRangeException()
         {
-            Student student = new Student("Gana", 99999);
+            IStudent gosho = new Student("Gosho", 55679);
+            IList<IStudent> students = new List<IStudent>();
+            ICourse course = new Course("Math", students);
 
-            ICourse course = new Course("Math");
-
-            course.LeaveFromCourse(student);
-        }
-
-        [Test]
-        public void TestCourseLimit_ShouldCreateCourseSuccessfully_With30Students()
-        {
-            Course course = new Course("Math");
-
-            for (int i = 0; i <= 30; i++)
-            {
-                Student student = new Student("Pesho", 10000 + i);
-
-                course.JoinToCourse(student);
-            }
+            Assert.Throws<IndexOutOfRangeException>(() => course.LeaveFromCourse(gosho));
         }
 
         [Test]
         public void TestCourseLimit_ToThrowIndexOutOfRangeException_IfStudentsInCourseAreBiggerThan30()
         {
-            Course course = new Course("Math");
-            Student studentPesho = new Student("Pesho", 10000);
+            IList<IStudent> students = new List<IStudent>();
+            ICourse course = new Course("Math", students);
+            IStudent pesho = new Student("Pesho",44467);
 
             for (int i = 0; i <= 30; i++)
             {
-                Student student = new Student("Gosho", 10000 + i);
+                IStudent student = new Student("Gosho", 10000 + i);
 
                 course.JoinToCourse(student);
             }
 
-            Assert.Throws<IndexOutOfRangeException>(() => course.JoinToCourse(studentPesho));
+            Assert.Throws<IndexOutOfRangeException>(() => course.JoinToCourse(pesho));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace School
 {
-    using global::School.Contracts;
+    using Contracts;
     using System;
     using System.Collections.Generic;
 
@@ -10,10 +10,10 @@
         private IList<IStudent> students;
         private string name;
 
-        public Course(string name)
+        public Course(string name, IList<IStudent> students)
         {
             this.Name = name;
-            students = new List<IStudent>();
+            this.Students = students;
         }
 
         public string Name
@@ -23,7 +23,7 @@
                 return this.name;
             }
 
-            private set
+            set
             {
                 if (String.IsNullOrEmpty(value))
                 {
@@ -31,7 +31,7 @@
                 }
 
                 this.name = value;
-            }     
+            }
         }
 
         public IList<IStudent> Students
@@ -39,7 +39,16 @@
             get
             {
                 return this.students;
-            }          
+            }
+            set
+            {
+                if (value.Count > MaxStudentsCountInCourse)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+
+                this.students = value;
+            }
         }
 
         public void JoinToCourse(IStudent student)
@@ -53,7 +62,16 @@
         }
 
         public void LeaveFromCourse(IStudent student)
-        {    
+        {
+            if (this.Students.Count == 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            else if (this.Students.IndexOf(student) == -1)
+            {
+                throw new ArgumentException();
+            }
+
             students.Remove(student);
         }
     }
