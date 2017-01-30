@@ -3,6 +3,7 @@
     using Contracts;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class Course : ICourse
     {
@@ -46,6 +47,10 @@
                 {
                     throw new IndexOutOfRangeException();
                 }
+                else if (value.GroupBy(x => x.ID).Any(g => g.Count() > 1))
+                {
+                    throw new ArgumentException();
+                }
 
                 this.students = value;
             }
@@ -55,7 +60,11 @@
         {
             if (students.Count > MaxStudentsCountInCourse)
             {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("All places,for this course,are occupied!");
+            }
+            else if (this.Students.GroupBy(x => x.ID).Any(y => y.Key == student.ID))
+            {
+                throw new ArgumentException("Student with same ID already exist"); 
             }
 
             students.Add(student);
