@@ -42,10 +42,12 @@
   <ItemGroup>
     <Compile Include="Contracts\ICourse.cs" />
     <Compile Include="Contracts\IStudent.cs" />
+    <Compile Include="Contracts\IData.cs" />
     <Compile Include="Course.cs" />
     <Compile Include="School.cs" />
     <Compile Include="Student.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StudentsCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

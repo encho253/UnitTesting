@@ -4,51 +4,87 @@
     using Contracts;
     using System;
     using System.Collections.Generic;
+    using Moq;
+    using System.Collections;
 
     [TestFixture]
     public class CourseTest
     {
-        [Test]
-        public void TestCourse_ToHaveExpectedName()
+        [TestCase("Phisics")]
+        [TestCase("Math")]
+        public void TestCourse_ToHaveExpectedName(string value)
         {
-            IStudent student = new Student("Pesho", 88991);
+            //Arrange and Act
+            ICourse course = new Course(value, new List<IStudent>());
+
+            //Assert
+            Assert.AreEqual(value, course.Name);
+        }
+
+        [TestCase("")]
+        [TestCase(null)]
+        [TestCase("    ")]
+        public void TestCourse_TryToSetCourseNameWithNullReference_ExpectedArgumentNullException(string value)
+        {
+            //Arrange, Act and Assert
+            Assert.Throws<ArgumentNullException>(() => new Course(value, new List<IStudent>()));
+        }
+      
+        [Test]
+        public void TestCourseLimit_IfStudentsInCourseAreBiggerThan30_ToThrowIndexOutOfRangeException()
+        {
             IList<IStudent> students = new List<IStudent>();
             ICourse course = new Course("Math", students);
+            IStudent pesho = new Student("Pesho", 44467);
 
-            string courseName = "Math";
+            for (int i = 0; i <= 30; i++)
+            {
+                IStudent student = new Student("Gosho", 10000 + i);
 
-            Assert.AreEqual(courseName, course.Name);
+                course.JoinToCourse(student);
+            }
+
+            Assert.Throws<IndexOutOfRangeException>(() => course.JoinToCourse(pesho));
         }
 
         [Test]
-        public void TestCourse_TryToSetCourseNameWithEmptyString_ExpectedArgumentNullException()
+        public void JoinToCourse_ShouldCallMethod_ExpectedTimes()
         {
-            IStudent student = new Student("Pesho", 88991);
-            IList<IStudent> students = new List<IStudent>();
-            ICourse course = new Course("Math", students);
+            //Arrange
+            Mock<IStudent> mockedStudent = new Mock<IStudent>();
+            Mock<IList> asdsa = new Mock<IList>();
 
-            Assert.Throws<ArgumentNullException>(() => course.Name = "");
-        }
-        [Test]
-        public void JoinToCourse_ShouldAddStudentToCourseSuccessfully_WitoutThrowException()
-        {
-            IStudent student = new Student("Pesho", 88991);
-            IList<IStudent> students = new List<IStudent>();
+            //Act
 
-            ICourse course = new Course("Math", students);
-
-            Assert.DoesNotThrow(() => course.JoinToCourse(student));
+            //Assert          
         }
 
         [Test]
-        public void LeaveFromCourse_ShouldStudentLeaveFromCourseSuccessfully_WitoutThrowException()
+        public void JoinToCourse_ShouldAddStudentToCourseSuccessfully_WithOutThrowException()
         {
-            IStudent student = new Student("Pesho", 88991);
-            IList<IStudent> students = new List<IStudent>();
-            students.Add(student);
-            ICourse course = new Course("Math", students);
+            //Arrange
+            Mock<IStudent> mockedStudent = new Mock<IStudent>();
+            Mock<ICourse> mockedCourse = new Mock<ICourse>();
 
-            Assert.DoesNotThrow(() => course.LeaveFromCourse(student));
+            //Act
+            mockedCourse.Setup(x => x.JoinToCourse(mockedStudent.Object));
+
+            //Assert
+
+        }
+
+        [Test]
+        public void LeaveFromCourse_ShouldCallMethod_ExactlyTimes()
+        {
+            //Arrange
+            Mock<IStudent> mockedStudent = new Mock<IStudent>();
+            Mock<ICourse> mockedCourse = new Mock<ICourse>();
+
+            //Act
+            mockedCourse.Object.LeaveFromCourse(mockedStudent.Object);
+
+            //Assert
+            mockedCourse.Verify(x => x.LeaveFromCourse(It.IsAny<IStudent>()), Times.Exactly(1));
         }
 
         [Test]
@@ -74,47 +110,15 @@
         }
 
         [Test]
-        public void TestCourseLimit_IfStudentsInCourseAreBiggerThan30_ToThrowIndexOutOfRangeException()
-        {
-            IList<IStudent> students = new List<IStudent>();
-            ICourse course = new Course("Math", students);
-            IStudent pesho = new Student("Pesho", 44467);
-
-            for (int i = 0; i <= 30; i++)
-            {
-                IStudent student = new Student("Gosho", 10000 + i);
-
-                course.JoinToCourse(student);
-            }
-
-            Assert.Throws<IndexOutOfRangeException>(() => course.JoinToCourse(pesho));
-        }
-
-        [Test]
-        public void TestCourseLimit_IfCourseContainSetOfStudents_WithCountBiggerThan30_ToThrowIndexOutOfRangeException()
-        {
-            IList<IStudent> students = new List<IStudent>();
-
-            for (int i = 0; i <= 30; i++)
-            {
-                IStudent student = new Student("Gosho", 10000 + i);
-
-                students.Add(student);
-            }
-
-            Assert.Throws<IndexOutOfRangeException>(() => new Course("Math", students));
-        }
-
-        [Test]
         public void TestCourseIDUnique_IfCourseContainTwoOrMoreStudentsWithEqualID_ToThrowArgumentException()
         {
             IList<IStudent> students = new List<IStudent>();
-            IStudent pesho = new Student("Pesho",10000);
+            IStudent pesho = new Student("Pesho", 10000);
             IStudent gosho = new Student("Gosho", 10000);
 
             students.Add(pesho);
             students.Add(gosho);
-          
+
             Assert.Throws<ArgumentException>(() => new Course("Math", students));
         }
 
@@ -126,7 +130,7 @@
             IStudent gosho = new Student("Gosho", 10000);
 
             students.Add(pesho);
-            ICourse course = new Course("Phisic",students);
+            ICourse course = new Course("Phisic", students);
 
             Assert.Throws<ArgumentException>(() => course.JoinToCourse(gosho));
         }

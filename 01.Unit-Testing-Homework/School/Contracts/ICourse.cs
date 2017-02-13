@@ -4,10 +4,12 @@
 
     public interface ICourse
     {
-        IList<IStudent> Students { get; set; }
-        string Name { get; set; }
+        IData Students { get; }
+
+        string Name { get; }
 
         void JoinToCourse(IStudent student);
+
         void LeaveFromCourse(IStudent student);
     }
 }

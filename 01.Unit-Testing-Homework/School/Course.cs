@@ -2,16 +2,15 @@
 {
     using Contracts;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
 
     public class Course : ICourse
     {
         private const int MaxStudentsCountInCourse = 30;
-        private IList<IStudent> students;
+        private IData students;
         private string name;
 
-        public Course(string name, IList<IStudent> students)
+        public Course(string name, IData students)
         {
             this.Name = name;
             this.Students = students;
@@ -26,7 +25,7 @@
 
             set
             {
-                if (String.IsNullOrEmpty(value))
+                if (String.IsNullOrWhiteSpace(value))
                 {
                     throw new ArgumentNullException();
                 }
@@ -35,7 +34,7 @@
             }
         }
 
-        public IList<IStudent> Students
+        public IData Students
         {
             get
             {
@@ -43,22 +42,18 @@
             }
             set
             {
-                if (value.Count > MaxStudentsCountInCourse)
+                if (value.Count() > MaxStudentsCountInCourse)
                 {
                     throw new IndexOutOfRangeException();
                 }
-                else if (value.GroupBy(x => x.ID).Any(g => g.Count() > 1))
-                {
-                    throw new ArgumentException();
-                }
-
+               
                 this.students = value;
             }
         }
 
         public void JoinToCourse(IStudent student)
         {
-            if (students.Count > MaxStudentsCountInCourse)
+            if (students.Count() > MaxStudentsCountInCourse)
             {
                 throw new IndexOutOfRangeException("All places,for this course,are occupied!");
             }
