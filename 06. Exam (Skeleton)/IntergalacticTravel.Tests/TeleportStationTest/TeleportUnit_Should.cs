@@ -302,8 +302,79 @@ namespace IntergalacticTravel.Tests.TeleportStationTest
         }
 
         [Test]
-        public void RequireAPaymentFromTheUnitToTeleportForTheProvidedService_WhenAllOfTheValidationsPassSuccessfullyAndTheUnitIsReadyForTeleportation()
+        public void ObtainAPaymentFromTheUnitToTeleportForTheProvidedServices_TheAmountOfResourcesOfTheTeleportStationMustBeIncreasedByTheAmountOfThePayment()
         {
+            //Arrange
+            var ownerMock = new Mock<IBusinessOwner>();
+            var locationMock = new Mock<ILocation>();
+            var unitToTeleportMock = new Mock<IUnit>();
+            var targetLocationMock = new Mock<ILocation>();
+            var pathMock = new Mock<IPath>();
+            var resourceMock = new Mock<IResources>();
+
+            var galaxyName = "Milky Way";
+            var planetName = "Venera";
+            var longtitude = 30.5;
+            var latitude = 20.5;
+            var anotherLongtitude = 40.5;
+            var anotherLatitude = 20.5;
+            uint bronz = 10;
+            uint silver = 10;
+            uint gold = 10;
+
+            var galacticMap = new List<IPath>();
+            var unitCollection = new List<IUnit>();
+
+            locationMock.Setup(x => x.Planet.Galaxy.Name).Returns(galaxyName);
+            locationMock.Setup(x => x.Planet.Name).Returns(planetName);
+
+            targetLocationMock.Setup(x => x.Planet.Galaxy.Name).Returns(galaxyName);
+            targetLocationMock.Setup(x => x.Planet.Name).Returns(planetName);
+            targetLocationMock.Setup(x => x.Coordinates.Longtitude).Returns(longtitude);
+            targetLocationMock.Setup(x => x.Coordinates.Latitude).Returns(latitude);
+
+            resourceMock.Setup(x => x.BronzeCoins).Returns(bronz);
+            resourceMock.Setup(x => x.SilverCoins).Returns(silver);
+            resourceMock.Setup(x => x.GoldCoins).Returns(gold);
+
+            unitToTeleportMock.Setup(x => x.CurrentLocation.Planet.Galaxy.Name).Returns(galaxyName);
+            unitToTeleportMock.Setup(x => x.CurrentLocation.Planet.Name).Returns(planetName);
+            unitToTeleportMock.Setup(x => x.CurrentLocation.Coordinates.Longtitude).Returns(anotherLongtitude);
+            unitToTeleportMock.Setup(x => x.CurrentLocation.Coordinates.Latitude).Returns(anotherLatitude);
+            unitToTeleportMock.Setup(x => x.CanPay(It.IsAny<IResources>())).Returns(true);
+            unitToTeleportMock.Setup(x => x.Pay(resourceMock.Object)).Returns(resourceMock.Object);
+            unitCollection.Add(unitToTeleportMock.Object);
+            unitToTeleportMock.Setup(x => x.CurrentLocation.Planet.Units).Returns(unitCollection);
+
+            pathMock.Setup(x => x.TargetLocation.Planet.Galaxy.Name).Returns(galaxyName);
+            pathMock.Setup(x => x.TargetLocation.Planet.Name).Returns(planetName);
+            pathMock.Setup(x => x.TargetLocation.Planet.Units).Returns(unitCollection);
+            pathMock.Setup(x => x.Cost).Returns(resourceMock.Object);
+
+            galacticMap.Add(pathMock.Object);
+
+            var teleportStationFake = new TeleportStationFake(ownerMock.Object, galacticMap, locationMock.Object);
+
+            var expectedGold = teleportStationFake.Resources.GoldCoins + resourceMock.Object.GoldCoins;
+            var expectedSilver = teleportStationFake.Resources.SilverCoins + resourceMock.Object.SilverCoins;
+            var expectedBrozne = teleportStationFake.Resources.BronzeCoins + resourceMock.Object.BronzeCoins;
+
+            //Act
+            teleportStationFake.TeleportUnit(unitToTeleportMock.Object, targetLocationMock.Object);
+            var actualGold = teleportStationFake.Resources.GoldCoins;
+            var actualSilver = teleportStationFake.Resources.SilverCoins;
+            var actualBronze = teleportStationFake.Resources.BronzeCoins;
+
+            //Assert
+            Assert.AreEqual(expectedGold, actualGold);
+            Assert.AreEqual(expectedSilver, actualSilver);
+            Assert.AreEqual(expectedBrozne, actualBronze);
+        }
+
+
+        [Test]
+        public void SetTheUnitToTeleportPreviousLocationToUnitToTeleportCurrentLocation_WhenAllOfTheValidationsPassSuccessfullyAndTheUnitIsBeingTeleported()
+        { 
             //Arrange
             var ownerMock = new Mock<IBusinessOwner>();
             var locationMock = new Mock<ILocation>();
